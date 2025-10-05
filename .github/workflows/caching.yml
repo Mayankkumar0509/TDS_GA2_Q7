@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v4
         with:
           # Cache the folder where dependencies are installed
-          path: node_modules
+          path: TDS_GA2_Q7/node_modules
           # Use the required static key
           key: cache-0828b3c
 
@@ -38,6 +38,7 @@ jobs:
       - name: Install dependencies (npm install)
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: npm install 
+        working-directory: TDS_GA2_Q7
   
       
       # 4. REQUIRED STEP: Echo the Cache Result
