@@ -38,6 +38,7 @@ jobs:
       - name: Install dependencies (npm install)
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: npm install 
+        working-directory: TDS_GA2_Q7
       
       # 4. REQUIRED STEP: Echo the Cache Result
       # Must have the exact name 'prime-cache-0828b3c'
