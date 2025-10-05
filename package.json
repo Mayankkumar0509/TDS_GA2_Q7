@@ -1,0 +1,10 @@
+{
+  "name": "github-caching-test",
+  "version": "1.0.0",
+  "description": "Basic file required for npm install to run in GitHub Actions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Test script placeholder\""
+  },
+  "license": "ISC"
+}
