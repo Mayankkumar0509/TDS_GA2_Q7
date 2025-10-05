@@ -1,7 +1,7 @@
 name: Dependency Caching CI
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows manual runs via the GitHub Actions tab for easy testing
   workflow_dispatch:
   # Runs on every push to the main branch
   push:
@@ -15,35 +15,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- REQUIRED CACHE STEP ---
+      # 1. Setup Node.js (Prerequisite for 'npm install')
       - name: Setup Node.js (Example Dependency)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # Step to cache the node_modules folder
+      # 2. REQUIRED STEP: Prime the Cache
+      # The 'id: cache-dependencies' is used to check the hit/miss status.
       - name: Prime the cache with key 'cache-0828b3c'
-        id: cache-dependencies  # Use an ID to reference outputs
+        id: cache-dependencies
         uses: actions/cache@v4
         with:
-          path: node_modules # Cache the common dependency folder
+          # Cache the folder where dependencies are installed
+          path: node_modules
+          # Use the required static key
           key: cache-0828b3c
-          # Note: Since the key is static, this will always be a MISS on the first run,
-          # and a HIT on subsequent runs if node_modules exists.
 
-      # Install dependencies (This step fills the cache on a MISS)
+      # 3. REQUIRED STEP: Install dependencies on a MISS
+      # This step runs ONLY if the cache-hit output is NOT 'true' (i.e., on a miss).
+      # This ensures the 'node_modules' directory is created so the cache can save it.
       - name: Install dependencies (npm install)
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: npm install # Replace with your language's install command (e.g., pip install)
+        run: npm install 
       
-      # --- REQUIRED ECHO STEP ---
+      # 4. REQUIRED STEP: Echo the Cache Result
+      # Must have the exact name 'prime-cache-0828b3c'
       - name: prime-cache-0828b3c
         run: |
-          # The cache result is accessed via the ID and the 'cache-hit' output variable
+          # Get the status from the previous cache step
           CACHE_STATUS=${{ steps.cache-dependencies.outputs.cache-hit }}
+          
           if [ "$CACHE_STATUS" = "true" ]; then
             echo "Cache hit: The cache was restored successfully."
           else
-            echo "Cache miss: Dependencies were installed and the cache will be saved."
+            # This covers the initial miss case
+            echo "Cache miss: Dependencies were installed, and a new cache will be saved."
           fi
-          echo "Cache step succeeded: The cache step always reports success as long as it executes."
